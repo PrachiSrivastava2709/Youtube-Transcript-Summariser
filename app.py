@@ -1,11 +1,12 @@
 from flask import Flask
 from youtube_transcript_api import YoutubeTranscriptApi
-# from datetime import datetime
+from transformers import T5ForConditionalGeneration, T5Tokenizer
 
-# define a variable to hold you app
 app = Flask(__name__)
 
-# define your resource endpoints
+tokenizer = T5Tokenizer.from_pretrained("t5-base")
+model = T5ForConditionalGeneration.from_pretrained("t5-base")
+
 app.route('/')
 def index_page():
     return "Hello world"
@@ -29,9 +30,13 @@ def summarize(transcript):
     '''
         Returns the summary of the transcript
     '''
+    input_ids = tokenizer.encode("summarize: " + transcript, return_tensors = "pt", max_length = 512, truncation = True)
+    output_ids = model.generate(input_ids, max_length = 150, min_length = 40, length_penalty = 2.0, num_beams = 4, early_stopping = True)
+    # print(output_ids)
+    summary = tokenizer.decode(output_ids[0])
+    # print(summary)
+    return summary
 
 
-
-# server the app when this file is run
 if __name__ == '__main__':
     app.run()

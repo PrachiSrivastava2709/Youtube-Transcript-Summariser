@@ -1,0 +1,4 @@
+https://thepythoncode.com/article/text-summarization-using-huggingface-transformers-python
+https://huggingface.co/blog/how-to-generate
+https://huggingface.co/docs/transformers/v4.39.3/en/main_classes/tokenizer#transformers.PreTrainedTokenizer.encode
+https://huggingface.co/docs/transformers/v4.39.3/en/main_classes/tokenizer#transformers.PreTrainedTokenizer.decode
