@@ -1,5 +1,5 @@
-from flask import Flask
-from youtube_transcript_api import YoutubeTranscriptApi
+from flask import Flask, request
+from youtube_transcript_api import YouTubeTranscriptApi
 from transformers import T5ForConditionalGeneration, T5Tokenizer
 
 app = Flask(__name__)
@@ -7,9 +7,20 @@ app = Flask(__name__)
 tokenizer = T5Tokenizer.from_pretrained("t5-base")
 model = T5ForConditionalGeneration.from_pretrained("t5-base")
 
-app.route('/')
+@app.route('/api/summarize')
 def index_page():
-    return "Hello world"
+    '''
+        Returns the summary after extracting the youtube video id from url
+    '''
+    url = request.args.get('youtube_url')
+    id = ''
+    params = url.split('?')[1].split('&')
+    for param in params:
+        if param[0:2] == 'v=':
+            id = param[2:]
+            break
+    summary = summarize(getTranscript(id))
+    return summary
 
 def formatTranscript(transcript):
     formatted = []
@@ -23,7 +34,7 @@ def getTranscript(id):
     '''
         Returns full parsed transcript from Youtube video id
     '''
-    transcript = formatTranscript(YoutubeTranscriptApi.get_transcript(id))
+    transcript = formatTranscript(YouTubeTranscriptApi.get_transcript(id))
     return transcript
 
 def summarize(transcript):
@@ -39,4 +50,4 @@ def summarize(transcript):
 
 
 if __name__ == '__main__':
-    app.run()
+    app.run(debug = True)
