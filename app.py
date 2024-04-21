@@ -1,8 +1,11 @@
 from flask import Flask, request
+from flask_cors import CORS
+import json
 from youtube_transcript_api import YouTubeTranscriptApi
 from transformers import T5ForConditionalGeneration, T5Tokenizer
 
 app = Flask(__name__)
+CORS(app)
 
 tokenizer = T5Tokenizer.from_pretrained("t5-base")
 model = T5ForConditionalGeneration.from_pretrained("t5-base")
@@ -19,7 +22,7 @@ def index_page():
         if param[0:2] == 'v=':
             id = param[2:]
             break
-    summary = summarize(getTranscript(id))
+    summary = json.dumps({"summary": summarize(getTranscript(id))})
     return summary
 
 def formatTranscript(transcript):
@@ -41,11 +44,10 @@ def summarize(transcript):
     '''
         Returns the summary of the transcript
     '''
-    input_ids = tokenizer.encode("summarize: " + transcript, return_tensors = "pt", max_length = 512, truncation = True)
-    output_ids = model.generate(input_ids, max_length = 150, min_length = 40, length_penalty = 2.0, num_beams = 4, early_stopping = True)
+    input_ids = tokenizer.encode("summarize: " + transcript, max_length = 5000, return_tensors = "pt", truncation = True)
+    output_ids = model.generate(input_ids, max_length = 500, min_length = 40, length_penalty = 2.0, num_beams = 4)
     # print(output_ids)
     summary = tokenizer.decode(output_ids[0])
-    # print(summary)
     return summary
 
 
