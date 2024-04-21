@@ -1,0 +1,14 @@
+{
+    "manifest_version": 3,
+    "name": "yt-summarizer",
+    "description": "Chrome Extension which provides a summary in transcript enabled youtube videos.",
+    "version": "1.0",
+    "permissions": ["activeTab"],
+    "action": {
+      "default_popup": "popup.html"
+    },
+    "content_scripts": [{
+        "matches": ["https://www.youtube.com/watch*"],
+        "js": ["./contentScript.js"]
+    }]
+}
